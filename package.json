@@ -4,15 +4,17 @@
   "private": true,
   "homepage": "http://giantjelly.net/reactmusic",
   "dependencies": {
-    "node-sass-chokidar": "^0.0.3",
+    "node-sass": "^4.5.3",
     "npm-run-all": "^4.1.1",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
-    "react-scripts": "1.0.13"
+    "react-redux": "^5.0.6",
+    "react-scripts": "1.0.13",
+    "redux": "^3.7.2"
   },
   "scripts": {
-    "build-css": "node-sass-chokidar src/app.sass src/app.css",
-    "start-css": "npm run build-css && node-sass-chokidar src/app.sass src/app.css --watch --recursive",
+    "build-css": "node-sass src/app.sass src/app.css",
+    "start-css": "npm run build-css && node-sass src/app.sass src/app.css --watch --recursive",
     "build-js": "react-scripts build",
     "start-js": "react-scripts start",
     "start": "npm-run-all -p start-js start-css",

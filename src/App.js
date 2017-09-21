@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 // import logo from './logo.svg';
-import './app.css';
+import {Provider} from 'react-redux'
+import Store from './Store'
 
 // https://accounts.spotify.com/en/authorize?client_id=cb8213ab5246444d905488cddfcd8972&response_type=token&redirect_uri=http:%2F%2Fmattsblog.net
 
@@ -30,16 +31,27 @@ export default class App extends Component {
 
     this.auth()
 
-    fetch('https://api.spotify.com/v1/me', {
-      headers: {
-        'Authorization': `Bearer ${this.token}`
-      }
-    }).then((res) => res.json()).then((res) => {
-      console.log(res)
+    // fetch('https://api.spotify.com/v1/me', {
+    //   headers: {
+    //     'Authorization': `Bearer ${this.token}`
+    //   }
+    // }).then((res) => res.json()).then((res) => {
+    //   console.log(res)
+    // })
+
+    Store.subscribe(this.storeListener)
+  }
+
+  storeListener = () => {
+    const data = Store.getState()
+    console.log({data})
+    this.setState({
+      results: data[this.state.type+'s']
     })
   }
 
   reAuth = () => {
+    console.log('re-auth')
     window.location = `https://accounts.spotify.com/en/authorize?client_id=cb8213ab5246444d905488cddfcd8972&response_type=token&redirect_uri=${encodeURIComponent('http://giantjelly.net/reactmusic')}`
   }
   auth = () => {
@@ -79,7 +91,12 @@ export default class App extends Component {
           //   playlists: res.playlists.items,
           //   tracks: res.tracks.items
           // })
-          this.setState({results:res[this.state.type+'s'].items})
+
+          // this.setState({results:res[this.state.type+'s'].items})
+          Store.dispatch({
+            type: 'ADD_TRACKS',
+            data: res[this.state.type+'s'].items
+          })
         }
       })
     } else {
@@ -100,51 +117,53 @@ export default class App extends Component {
 
   render() {
     return (
-      <main>
-        <h1>React Music</h1>
-        {/*<p>Search</p>*/}
-        <div className="flex-sides">
-          <input className="form__input" type="text" onChange={this.searchChange} name="search" value={this.state.search} placeholder="Search" autoFocus />
-          <div className="type-selector">
-            <a onClick={this.typeChange} href="#" data-value="track" className={'button '+ (this.state.type=='track' && 'button--active')}>Tracks</a>
-            <a onClick={this.typeChange} href="#" data-value="artist" className={'button '+ (this.state.type=='artist' && 'button--active')}>Artists</a>
-            <a onClick={this.typeChange} href="#" data-value="album" className={'button '+ (this.state.type=='album' && 'button--active')}>Albums</a>
-            <a onClick={this.typeChange} href="#" data-value="playlist" className={'button '+ (this.state.type=='playlist' && 'button--active')}>Playlists</a>
+      <Provider store={Store}>
+        <main>
+          <h1>React Music</h1>
+          {/*<p>Search</p>*/}
+          <div className="flex-sides">
+            <input className="form__input" type="text" onChange={this.searchChange} name="search" value={this.state.search} placeholder="Search" autoFocus />
+            <div className="type-selector">
+              <a onClick={this.typeChange} href="#" data-value="track" className={'button '+ (this.state.type=='track' && 'button--active')}>Tracks</a>
+              <a onClick={this.typeChange} href="#" data-value="artist" className={'button '+ (this.state.type=='artist' && 'button--active')}>Artists</a>
+              <a onClick={this.typeChange} href="#" data-value="album" className={'button '+ (this.state.type=='album' && 'button--active')}>Albums</a>
+              <a onClick={this.typeChange} href="#" data-value="playlist" className={'button '+ (this.state.type=='playlist' && 'button--active')}>Playlists</a>
+            </div>
           </div>
-        </div>
-        {/*<button type="submit">Search</button>*/}
+          {/*<button type="submit">Search</button>*/}
 
-        {this.state.results.length>0 &&
-          <div>
-            <h2>{this.state.type.charAt(0).toUpperCase()+this.state.type.slice(1)}s</h2>
-            {this.state.type == 'track' ?
-              <div>
-                <p className="track">
-                  <span className="track__name track__key">Song</span>
-                  <span className="track__artist track__key">Artist</span>
-                </p>
-                {this.state.results.map((v,i) =>
-                  <p className="track" key={i}>
-                    <a className="track__name track__link" href={v.external_urls.spotify} target="_blank">{v.name}</a>
-                    <span className="track__artist">{v.artists[0].name}</span>
+          {this.state.results.length>0 &&
+            <div>
+              <h2>{this.state.type.charAt(0).toUpperCase()+this.state.type.slice(1)}s</h2>
+              {this.state.type == 'track' ?
+                <div>
+                  <p className="track">
+                    <span className="track__name track__key">Song</span>
+                    <span className="track__artist track__key">Artist</span>
                   </p>
-                )}
-              </div>
-            :
-              <div>
-                <section className="results">
                   {this.state.results.map((v,i) =>
-                    <div key={i} className="result">
-                      {v.images[0] && <img className="result__image" height="50" src={v.images[0].url} />}
-                      <p className="result__name">{v.name}</p>
-                    </div>
+                    <p className="track" key={i}>
+                      <a className="track__name track__link" href={v.external_urls.spotify} target="_blank">{v.name}</a>
+                      <span className="track__artist">{v.artists[0].name}</span>
+                    </p>
                   )}
-                </section>
-              </div>
-            }
-          </div>
-        }
-      </main>
+                </div>
+              :
+                <div>
+                  <section className="results">
+                    {this.state.results.map((v,i) =>
+                      <div key={i} className="result">
+                        {v.images[0] && <img className="result__image" height="50" src={v.images[0].url} />}
+                        <p className="result__name">{v.name}</p>
+                      </div>
+                    )}
+                  </section>
+                </div>
+              }
+            </div>
+          }
+        </main>
+      </Provider>
     );
   }
 }
