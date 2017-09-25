@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 // import logo from './logo.svg';
 import {Provider} from 'react-redux'
 import Store from './Store'
+import Card from 'Card'
 
 // https://accounts.spotify.com/en/authorize?client_id=cb8213ab5246444d905488cddfcd8972&response_type=token&redirect_uri=http:%2F%2Fmattsblog.net
 
@@ -92,11 +93,11 @@ export default class App extends Component {
           //   tracks: res.tracks.items
           // })
 
-          // this.setState({results:res[this.state.type+'s'].items})
-          Store.dispatch({
-            type: 'ADD_TRACKS',
-            data: res[this.state.type+'s'].items
-          })
+          this.setState({results:res[this.state.type+'s'].items})
+          // Store.dispatch({
+          //   type: 'ADD_TRACKS',
+          //   data: res[this.state.type+'s'].items
+          // })
         }
       })
     } else {
@@ -152,9 +153,9 @@ export default class App extends Component {
                 <div>
                   <section className="results">
                     {this.state.results.map((v,i) =>
-                      <div key={i} className="result">
-                        {v.images[0] && <img className="result__image" height="50" src={v.images[0].url} />}
-                        <p className="result__name">{v.name}</p>
+                      <div key={i}>
+                        <p>testing...</p>
+                        <Card name={v.name} image={v.images[0] && v.images[0].url} />
                       </div>
                     )}
                   </section>

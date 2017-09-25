@@ -6,6 +6,7 @@
   "dependencies": {
     "node-sass": "^4.5.3",
     "npm-run-all": "^4.1.1",
+    "radium": "^0.19.4",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-redux": "^5.0.6",
@@ -15,8 +16,8 @@
   "scripts": {
     "build-css": "node-sass src/app.sass src/app.css",
     "start-css": "npm run build-css && node-sass src/app.sass src/app.css --watch --recursive",
-    "build-js": "react-scripts build",
-    "start-js": "react-scripts start",
+    "build-js": "NODE_PATH=./src react-scripts build",
+    "start-js": "NODE_PATH=./src react-scripts start",
     "start": "npm-run-all -p start-js start-css",
     "build": "npm-run-all -p build-js build-css",
     "test": "react-scripts test --env=jsdom",
